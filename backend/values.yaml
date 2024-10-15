@@ -1,0 +1,18 @@
+backend:
+  name: nodejs-app-backend
+  namespace: test01
+  labels:
+    env: dev
+    tier: backend
+  spec:
+    replicas: 1
+    labels:
+      app: nodejs-app
+    selectors:
+      app: nodejs-app
+    containers:
+    - name: nodejs-app
+      image: node
+      tag: 19-alpine3.16
+      command: ["sleep", "100000"]
+      pullPolicy: Always

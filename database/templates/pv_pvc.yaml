@@ -1,0 +1,32 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: {{ .Values.database.PersistentVolume.name }}
+  namespace: {{ .Values.database.PersistentVolume.namespace }}
+  labels:
+  {{- toYaml .Values.database.PersistentVolume.labels | nindent 4 }}
+spec:
+  storageClassName: {{ .Values.database.PersistentVolume.spec.storageClassName }}
+  capacity:
+    storage: {{ .Values.database.PersistentVolume.spec.capacity.storage }}
+  accessModes:
+  {{- toYaml .Values.database.PersistentVolume.spec.accessModes | nindent 4 }}
+  hostPath:
+    path: {{ .Values.database.PersistentVolume.spec.hostPath }}
+
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Values.database.PersistentVolumeClaim.name }}
+  namespace: {{ .Values.database.PersistentVolumeClaim.namespace }}
+  labels:
+  {{- toYaml .Values.database.PersistentVolumeClaim.labels | nindent 4 }}
+spec:
+  storageClassName: {{ .Values.database.PersistentVolumeClaim.spec.storageClassName }}
+  accessModes:
+  {{- toYaml .Values.database.PersistentVolumeClaim.spec.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .Values.database.PersistentVolumeClaim.spec.resources.requests.storage }}

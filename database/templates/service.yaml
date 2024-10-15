@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.database.service.name }}
+  namespace: {{ .Values.database.service.namespace }}
+  labels:
+  {{- toYaml .Values.database.service.labels }}
+spec:
+  type: {{ .Values.database.service.spec.type }}
+  ports:
+  {{- range $port := .Values.database.service.spec.ports }}
+  - port: {{ $port.port }} # Sets port to run the postgres application
+  {{- end }}
+  selector:
+  {{- toYaml .Values.database.service.spec.selectors }}

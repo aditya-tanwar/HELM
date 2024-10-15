@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.database.name }}
+  namespace: {{ .Values.database.namespace }}
+  labels:
+  {{- toYaml .Values.database.labels }}
+spec:
+  replicas: {{ .Values.database.spec.replicas }}
+  selector:
+    matchLabels:
+    {{- toYaml .Values.database.spec.selectors }}
+  template:
+    metadata:
+      labels:
+      {{- toYaml .Values.database.spec.labels }}
+    spec:
+      containers:
+#------------------#
+      {{- range $name := .Values.database.spec.containers }}
+      - name: {{ $name.name }}
+        image: {{ $name.image }}:{{ $name.tag }}
+        imagePullPolicy: {{ $name.pullPolicy }}
+
+        ports:
+        {{- range $port := $name.ports }}
+        - containerPort: {{ $port.containerPort }}
+        {{- end }}
+
+        envFrom:
+        - configMapRef: # Maps env variable from ConfigMap
+            name: {{ $name.configMapRef.name }}
+
+        volumeMounts:
+        {{- range $mounts := $name.volumeMounts }}
+        - mountPath: {{ $mounts.mountPath }}
+          name: {{ $mounts.name }}
+        {{- end }}
+      {{- end }}
+#------------------#
+      volumes:
+        {{- range $volumes := .Values.database.spec.volumes }} 
+      - name: {{ $volumes.name }}
+        persistentVolumeClaim:
+          claimName: {{ $volumes.pvc.name }} # Maps claim from PersistantVolumeClaim
+      {{- end }}

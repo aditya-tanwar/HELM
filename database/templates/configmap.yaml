@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.database.configMap.name }}
+  namespace: {{ .Values.database.configMap.namespace }}
+  labels:
+  {{- toYaml .Values.database.configMap.labels | nindent 4 }}
+data:
+{{- toYaml .Values.database.configMap.data | nindent 4 }}
+

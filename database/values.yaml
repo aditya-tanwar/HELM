@@ -1,0 +1,80 @@
+database:
+  name: postgres-db
+  namespace: test01
+  labels:
+    env: dev
+
+  service:
+    name: postgres
+    namespace: test01
+    labels:
+      env: dev
+    spec:
+      type: ClusterIP
+      selectors:
+        app: postgres-db
+      ports:
+      - port: 5432
+
+  configMap:
+    name:
+    namespace:
+    labels:
+      env: dev
+      app: postgres-db
+    data:
+      POSTGRES_DB: postgresdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: mypass
+
+  spec:
+    replicas: 1
+    selectors:
+      app: postgres-db
+    labels:
+      app: postgres-db
+    containers:
+    - name: postgres-ddb
+      image: postgres
+      tag: 10.1
+      pullPolicy: "IfNotPresent"
+      ports:
+      - containerPort: 5432
+      configMapRef:
+        name: postgres-config
+      volumeMounts:
+      - name: postgres-volume
+        mountPath: /var/lib/postgresql/data
+    volumes:
+    - name: postgres-volume
+      pvc:
+        name: postgres-pv-claim
+
+  PersistentVolume:
+    name: postgres-pv-volume
+    namespace: test01
+    labels:
+      type: local # sets pv type to local 
+      app: postgres-db
+    spec:
+      storageClassName: manual
+      capacity:
+        storage: 1Gi
+      accessModes:
+      - ReadWriteMany
+      hostPath: "/mnt/data"
+
+
+  PersistentVolumeClaim:
+    name: postgres-pv-claim
+    namespace: test01
+    labels:
+      app: postgres-db
+      env: dev
+    spec:
+      storageClassName: manual
+      accessModes:
+      - ReadWriteMany
+      resources:
+        requests:
+          storage: 1Gi
