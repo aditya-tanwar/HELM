@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backend.name }}
+  namespace: {{ .Values.backend.namespace }}
+
+  # this will basically show everything under the label parameter  
+  labels:
+  {{- toYaml .Values.backend.labels | nindent 4 }} 
+spec:
+  selector:
+    matchLabels:
+    {{- toYaml .Values.backend.spec.selectors | nindent 6 }}
+  replicas: {{ .Values.backend.spec.replicas }}
+  template:
+    metadata:
+      labels:
+      {{- toYaml .Values.backend.spec.labels | nindent 8 }}
+    spec:
+      containers:
+      {{- range $name := .Values.backend.spec.containers }}
+      - name: {{ $name.name }}
+        image: {{ $name.image }}:{{ $name.tag }}
+        command: {{ range $cmd := $name.command }}{{ $cmd }} {{ end }}
+      {{- end }}
+
+

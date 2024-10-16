@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Values.frontend.namespace }}
+  labels: 
+      {{- range $key, $value := .Values.frontend.labels }}
+      {{ $key }}: {{ $value }}
+      {{- end }}
+spec:
+  selector:
+    matchLabels:
+    # this is basically to include everything under the selector section
+       {{- range $key, $value := .Values.frontend.spec.selectors }}
+       {{ $key }}: {{ $value }}
+       {{- end }}
+  replicas: {{ .Values.frontend.spec.replicas }} # this will call values from the values.yaml file 
+  template:
+    metadata:
+      labels:
+        {{- range $key, $value := .Values.frontend.spec.labels }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
+    spec:
+      containers:
+      - name: {{ .Values.frontend.spec.containers.name }}
+        image: {{ .Values.frontend.spec.containers.image.repository }}:{{ .Values.frontend.spec.containers.image.tag }}
+        imagePullPolicy: {{ .Values.frontend.spec.containers.image.pullPolicy }}
+        ports: 
+        {{- range .Values.frontend.spec.containers.ports }}
+        - containerPort: {{ .containerPort }}
+        {{- end}}
+

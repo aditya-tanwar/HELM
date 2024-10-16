@@ -1,0 +1,38 @@
+
+frontend:
+  name: fapp01
+  namespace: test01
+  labels:
+    env: dev
+    # this section  is for service related config 
+  service:
+    name: fapp01-svc
+    namespace: test01
+    spec:
+      type: NodePort
+      ports:
+      - port: 80
+        protocol: TCP
+        targetPort: 80
+
+  # the below section is for creating the templated for the deployment 
+  spec:
+    replicas: 1
+    labels:
+      app: web-httpd
+    selectors:
+      app: web-httpd
+    containers:
+      name: web-httpd
+      image:
+        repository: httpd
+        tag: 2.4.55
+        pullPolicy: Always
+      ports:
+      - containerPort: 80
+
+
+
+
+
+
